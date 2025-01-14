@@ -1,6 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.ORM.DbContext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,41 +11,58 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly AppDbContext _context;
+        private readonly DefaultContext _context;
 
-        public Task AddProduct(Product product)
+        public ProductRepository(DefaultContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task DeleteProduct(int id)
+        public async Task AddProduct(Product product)
         {
-            throw new NotImplementedException();
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Product>> GetAllProducts()
+        public async Task DeleteProduct(int id)
         {
-            throw new NotImplementedException();
+            var product = await GetproductById(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task<IEnumerable<string>> GetCategories()
+        public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            throw new NotImplementedException();
+            return await _context.Products.ToListAsync();
         }
 
-        public Task<IEnumerable<Product>> GetProductByCategory()
+        public async Task<IEnumerable<string>> GetCategories()
         {
-            throw new NotImplementedException();
+            return await _context.Products
+                                .Select(p => p.Category)
+                                .Distinct()
+                                .ToListAsync();
         }
 
-        public Task<Product> GetproductById(int id)
+        public async Task<IEnumerable<Product>> GetProductByCategory(String category)
         {
-            throw new NotImplementedException();
+            return await _context.Products
+                                 .Where(p => p.Category == category)
+                                 .ToListAsync();
         }
 
-        public Task UpdateProduct(Product product)
+        public async Task<Product> GetproductById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Products.FindAsync(id);
+        }
+
+        public async Task UpdateProduct(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
         }
     }
 

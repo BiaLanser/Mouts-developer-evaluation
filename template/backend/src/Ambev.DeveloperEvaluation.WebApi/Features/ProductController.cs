@@ -19,7 +19,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _productService.GetAllAsync();
+            var products = await _productService.GetAllProducts();
             return Ok(products);
         }
 
@@ -27,7 +27,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
-            var product = await _productService.GetByIdAsync(id);
+            var product = await _productService.GetProductById(id);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
