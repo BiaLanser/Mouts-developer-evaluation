@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
-    internal class Rating
+    public class Rating
     {
         public decimal Rate { get; set; }
         public int Count { get; set; }

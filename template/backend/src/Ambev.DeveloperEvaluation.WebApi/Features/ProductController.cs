@@ -15,7 +15,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             _productService = productService;
         }
 
-        // GET: /api/products
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
         {
@@ -23,7 +22,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(products);
         }
 
-        // GET: /api/products/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -34,18 +32,16 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(product);
         }
 
-        // POST: /api/products
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] Product product)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _productService.AddProductAsync(product);
+            await _productService.AddProduct(product);
             return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
         }
 
-        // PUT: /api/products/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
         {
@@ -55,39 +51,37 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             if (id != product.Id)
                 return BadRequest(new { message = "Product ID mismatch" });
 
-            var existingProduct = await _productService.GetByIdAsync(id);
+            var existingProduct = await _productService.GetProductById(id);
             if (existingProduct == null)
                 return NotFound(new { message = "Product not found" });
 
-            await _productService.UpdateProductAsync(product);
+            await _productService.UpdateProduct(product);
             return Ok(product);
         }
 
-        // DELETE: /api/products/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _productService.GetByIdAsync(id);
+            var product = await _productService.GetProductById(id);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
-            await _productService.DeleteProductAsync(id);
+            await _productService.DeleteProduct(id);
             return NoContent();
         }
 
-        // GET: /api/products/categories
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = await _productService.GetCategoriesAsync();
+            var categories = await _productService.GetCategories();
             return Ok(categories);
         }
 
-        // GET: /api/products/category/{category}
         [HttpGet("category/{category}")]
         public async Task<IActionResult> GetProductByCategory(string category)
         {
-            var products = await _productService.GetByCategoryAsync(category);
+            var products = await _productService.GetProductByCategory(category);
             return Ok(products);
         }
     }
+}

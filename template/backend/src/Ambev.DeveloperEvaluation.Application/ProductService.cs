@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Application
 {
-    internal class ProductService : IProductService
+    public class ProductService : IProductService
     {
 
         private readonly IProductRepository _productRepository;
@@ -42,7 +42,7 @@ namespace Ambev.DeveloperEvaluation.Application
 
         public async Task<IEnumerable<Product>> GetProductByCategory(string category)
         {
-            var products = await _productRepository.GetProductByCategory();
+            var products = await _productRepository.GetProductByCategory(category);
             return products.Where(p => p.Category.Equals(category, System.StringComparison.OrdinalIgnoreCase));
         }
 

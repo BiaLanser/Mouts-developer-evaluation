@@ -26,7 +26,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
         public async Task DeleteProduct(int id)
         {
-            var product = await GetproductById(id);
+            var product = await GetProductById(id);
             if (product != null)
             {
                 _context.Products.Remove(product);
@@ -54,16 +54,43 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
                                  .ToListAsync();
         }
 
-        public async Task<Product> GetproductById(int id)
+        public async Task<Product> GetProductById(int id)
         {
             return await _context.Products.FindAsync(id);
         }
 
         public async Task UpdateProduct(Product product)
         {
-            _context.Products.Update(product);
+            var existingProduct = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == product.Id);
+
+            if (existingProduct != null)
+            {
+                existingProduct.Title = product.Title;
+                existingProduct.Price = product.Price;
+                existingProduct.Description = product.Description;
+                existingProduct.Category = product.Category;
+                existingProduct.Image = product.Image;
+
+                // Atualiza o Rating, se necessário
+                if (existingProduct.Rating != null && product.Rating != null)
+                {
+                    existingProduct.Rating.Rate = product.Rating.Rate;
+                    existingProduct.Rating.Count = product.Rating.Count;
+                }
+                else if (product.Rating != null)
+                {
+                    existingProduct.Rating = product.Rating;
+                }
+            }
+            else
+            {
+                _context.Products.Update(product);
+            }
+
             await _context.SaveChangesAsync();
         }
+
     }
 
 }
