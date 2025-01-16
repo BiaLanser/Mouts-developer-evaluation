@@ -14,7 +14,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Services
         Task AddProduct(Product product);
         Task UpdateProduct(Product product);
         Task DeleteProduct(int id);
-        Task<IEnumerable<string>> GetCategories(); //categorias
+        Task<IEnumerable<string>> GetCategories();
         Task<IEnumerable<Product>> GetProductByCategory(string category);
     }
 }

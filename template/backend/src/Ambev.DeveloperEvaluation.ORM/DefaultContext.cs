@@ -11,6 +11,10 @@ public class DefaultContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Rating> Ratings { get; set; }
+    public DbSet<Cart> Carts { get; set; }
+    public DbSet<CartProduct> CartProducts { get; set; }
+    public DbSet<Sale> Sales { get; set; }
+    public DbSet<SaleItem> SaleItems { get; set; }
 
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {
@@ -18,10 +22,47 @@ public class DefaultContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //PRODUCT
         modelBuilder.Entity<Product>().OwnsOne(p => p.Rating);
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        //CART 
+        modelBuilder.Entity<CartProduct>()
+            .HasKey(cp => cp.Id);
+
+        modelBuilder.Entity<CartProduct>()
+            .HasOne(cp => cp.Cart)
+            .WithMany(c => c.Products)
+            .HasForeignKey(cp => cp.CartId)
+            .HasConstraintName("FK_CartProduct_Cart_CartId");
+
+        modelBuilder.Entity<CartProduct>()
+            .HasOne(cp => cp.Product)
+            .WithMany()
+            .HasForeignKey(cp => cp.ProductId)
+            .HasConstraintName("FK_CartProduct_Product_ProductId");
+
+        //SALE
+        modelBuilder.Entity<Sale>()
+            .HasMany(s => s.Items)
+            .WithOne(si => si.Sale)
+            .HasForeignKey(si => si.SaleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SaleItem>()
+            .HasOne(si => si.Product)
+            .WithMany()
+            .HasForeignKey(si => si.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Sale>()
+            .Ignore(s => s.TotalSaleAmount);
+
+        modelBuilder.Entity<SaleItem>()
+            .Ignore(si => si.TotalAmount);
+
         base.OnModelCreating(modelBuilder);
     }
+
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 {
