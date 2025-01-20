@@ -21,15 +21,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         {
             var carts = await _cartService.GetAllCarts();
 
-            var cartDtos = carts.Select(cart => new
+            var cartDtos = carts.Select(cart => new CartDto
             {
-                cart.Id,
-                cart.UserId,
-                cart.Date,
+                Id = cart.Id,
+                UserId = cart.UserId,
+                Date = cart.Date,
                 Products = cart.Products.Select(cp => new CartProductDto
                 {
-                    Id = cp.Id,
-                    ProductId = cp.ProductId 
+                ProductId = cp.ProductId,
+                Quantity = cp.Quantity
                 }).ToList()
             }).ToList();
 
@@ -43,15 +43,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             if (cart == null)
                 return NotFound();
 
-            var cartDto = new
+            var cartDto = new CartDto
             {
-                cart.Id,
-                cart.UserId,
-                cart.Date,
+                Id = cart.Id,
+                UserId = cart.UserId,
+                Date = cart.Date,
                 Products = cart.Products.Select(cp => new CartProductDto
                 {
-                    Id = cp.Id,
-                    ProductId = cp.ProductId 
+                    ProductId = cp.ProductId,
+                    Quantity = cp.Quantity
                 }).ToList()
             };
 
@@ -59,26 +59,73 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Cart cart)
+        public async Task<IActionResult> Create([FromBody] CreateCartDto createCartDto)
         {
-            if (cart == null)
+            if (createCartDto == null)
                 return BadRequest();
 
+            var cart = new Cart
+            {
+                UserId = createCartDto.UserId,
+                Products = createCartDto.Products.Select(p => new CartProduct
+                {
+                    ProductId = p.ProductId,
+                    Quantity = p.Quantity
+                }).ToList(),
+                Date = DateTime.UtcNow
+            };
+
             var createdCart = await _cartService.AddCart(cart);
-            return CreatedAtAction(nameof(GetById), new { id = createdCart.Id }, createdCart);
+
+            var cartDto = new CartDto
+            {
+                Id = createdCart.Id,
+                UserId = createdCart.UserId,
+                Date = createdCart.Date,
+                Products = cart.Products.Select(cp => new CartProductDto
+                {
+                    ProductId = cp.ProductId,
+                    Quantity = cp.Quantity
+                }).ToList()
+            };
+            return CreatedAtAction(nameof(GetById), new { id = createdCart.Id }, cartDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Cart cart)
+        public async Task<IActionResult> Update(int id, [FromBody] CreateCartDto createCartDto)
         {
-            if (cart == null || id != cart.Id)
+            if (createCartDto == null)
                 return BadRequest();
 
-            var updatedCart = await _cartService.UpdateCart(id, cart);
+            var cartToUpdate = new Cart
+            {
+                UserId = createCartDto.UserId,
+                Products = createCartDto.Products.Select(p => new CartProduct
+                {
+                    ProductId = p.ProductId,
+                    Quantity = p.Quantity
+                }).ToList(),
+                Date = DateTime.UtcNow
+            };
+
+            var updatedCart = await _cartService.UpdateCart(id, cartToUpdate);
+
+            var cartDto = new CartDto
+            {
+                Id = updatedCart.Id,
+                UserId = updatedCart.UserId,
+                Date = updatedCart.Date,
+                Products = cartToUpdate.Products.Select(cp => new CartProductDto
+                {
+                    ProductId = cp.ProductId,
+                    Quantity = cp.Quantity
+                }).ToList()
+            };
+
             if (updatedCart == null)
                 return NotFound();
 
-            return Ok(updatedCart);
+            return Ok(cartDto);
         }
 
         [HttpDelete("{id}")]
@@ -93,4 +140,3 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
     }
 }
-S

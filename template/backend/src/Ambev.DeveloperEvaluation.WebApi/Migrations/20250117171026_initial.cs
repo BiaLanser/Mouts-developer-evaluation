@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Category = table.Column<string>(type: "text", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: false)
@@ -41,6 +41,24 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sales",
+                columns: table => new
+                {
+                    SaleNumber = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SaleDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
+                    Branch = table.Column<string>(type: "text", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "boolean", nullable: false),
+                    Discount = table.Column<decimal>(type: "numeric", nullable: false),
+                    CartId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sales", x => x.SaleNumber);
                 });
 
             migrationBuilder.CreateTable(
@@ -108,6 +126,35 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SaleItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SaleId = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ProductName = table.Column<string>(type: "text", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SaleItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SaleItem_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SaleItem_Sales_SaleId",
+                        column: x => x.SaleId,
+                        principalTable: "Sales",
+                        principalColumn: "SaleNumber",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CartProducts_CartId",
                 table: "CartProducts",
@@ -117,6 +164,16 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                 name: "IX_CartProducts_ProductId",
                 table: "CartProducts",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SaleItem_ProductId",
+                table: "SaleItem",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SaleItem_SaleId",
+                table: "SaleItem",
+                column: "SaleId");
         }
 
         /// <inheritdoc />
@@ -129,6 +186,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                 name: "Ratings");
 
             migrationBuilder.DropTable(
+                name: "SaleItem");
+
+            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
@@ -136,6 +196,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Sales");
         }
     }
 }

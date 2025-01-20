@@ -3,6 +3,7 @@ using System;
 using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 {
     [DbContext(typeof(DefaultContext))]
-    partial class DefaultContextModelSnapshot : ModelSnapshot
+    [Migration("20250117171026_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +41,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.CartProduct", b =>
@@ -64,7 +67,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartProducts", (string)null);
+                    b.ToTable("CartProducts");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Product", b =>
@@ -96,7 +99,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Sale", b =>
@@ -126,14 +129,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                     b.Property<DateTime>("SaleDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("TotalSaleAmount")
-                        .HasColumnType("numeric");
-
                     b.HasKey("SaleNumber");
 
-                    b.HasIndex("CartId");
-
-                    b.ToTable("Sales", (string)null);
+                    b.ToTable("Sales");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.SaleItem", b =>
@@ -148,6 +146,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ProductName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Quantity")
@@ -155,9 +154,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.Property<int>("SaleId")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("numeric");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric");
@@ -168,7 +164,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.HasIndex("SaleId");
 
-                    b.ToTable("SaleItem", (string)null);
+                    b.ToTable("SaleItem");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.User", b =>
@@ -207,7 +203,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.CartProduct", b =>
@@ -233,7 +229,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Product", b =>
                 {
-                    b.OwnsOne("Ambev.DeveloperEvaluation.Domain.Entities.Product.Rating#Ambev.DeveloperEvaluation.Domain.Entities.Rating", "Rating", b1 =>
+                    b.OwnsOne("Ambev.DeveloperEvaluation.Domain.Entities.Rating", "Rating", b1 =>
                         {
                             b1.Property<int>("ProductId")
                                 .HasColumnType("integer");
@@ -246,7 +242,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 
                             b1.HasKey("ProductId");
 
-                            b1.ToTable("Ratings", (string)null);
+                            b1.ToTable("Ratings");
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
@@ -256,23 +252,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.Sale", b =>
-                {
-                    b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.Cart", "Cart")
-                        .WithMany()
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-                });
-
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.SaleItem", b =>
                 {
                     b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Ambev.DeveloperEvaluation.Domain.Entities.Sale", "Sale")

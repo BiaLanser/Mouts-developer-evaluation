@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Application.Products;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,10 +34,20 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] Product product)
+        public async Task<IActionResult> AddProduct([FromBody] CreateProductDto createProductDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var product = new Product
+            {
+                Title = createProductDto.Title,
+                Price = createProductDto.Price,
+                Description = createProductDto.Description,
+                Category = createProductDto.Category,
+                Image = createProductDto.Image,
+                Rating = createProductDto.Rating
+            };
 
             await _productService.AddProduct(product);
             return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
