@@ -1,6 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Carts;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Services;
+using Ambev.DeveloperEvaluation.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features
@@ -17,23 +18,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
         {
-            var carts = await _cartService.GetAllCarts();
-
-            var cartDtos = carts.Select(cart => new CartDto
-            {
-                Id = cart.Id,
-                UserId = cart.UserId,
-                Date = cart.Date,
-                Products = cart.Products.Select(cp => new CartProductDto
-                {
-                ProductId = cp.ProductId,
-                Quantity = cp.Quantity
-                }).ToList()
-            }).ToList();
-
-            return Ok(cartDtos);
+            var carts = await _cartService.GetAllCarts(_page, _size, _order);
+            return Ok(carts);      
         }
 
         [HttpGet("{id}")]
