@@ -3,6 +3,7 @@ using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features
 {
@@ -17,6 +18,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             _cartService = cartService;
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
         {
@@ -24,6 +26,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(carts);      
         }
 
+
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -46,6 +50,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(cartDto);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateCartDto createCartDto)
         {
@@ -79,6 +84,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return CreatedAtAction(nameof(GetById), new { id = createdCart.Id }, cartDto);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateCartDto createCartDto)
         {
@@ -116,6 +122,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(cartDto);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
