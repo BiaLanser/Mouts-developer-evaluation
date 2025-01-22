@@ -5,11 +5,13 @@ using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Ambev.DeveloperEvaluation.WebApi.Migrations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SaleController : ControllerBase
@@ -28,6 +30,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SaleDto>>> GetAllSales()
         {
@@ -67,6 +70,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         public async Task<ActionResult<SaleDto>> CreateSale([FromBody] CreateSaleDto createSale)
         {
@@ -136,7 +140,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
 
-
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{saleNumber}")]
         public async Task<ActionResult<SaleDto>> GetSaleBySaleNumber(int saleNumber)
         {
@@ -166,8 +170,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
             return Ok(saleDto);
         }
-        
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPatch("cancel/{saleNumber}")]
         public async Task<IActionResult> CancelSale(int saleNumber)
         {
@@ -197,7 +201,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
             return Ok(saleDto);
         }
-        
+
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{saleNumber}")]
         public async Task<ActionResult<SaleDto>> UpdateSale(int saleNumber, [FromBody] CreateSaleDto updateSaleDto)
         {
@@ -264,6 +269,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(saleDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{saleNumber}")]
         public async Task<IActionResult> DeleteSale(int saleNumber)
         {
