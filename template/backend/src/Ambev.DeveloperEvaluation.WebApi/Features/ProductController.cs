@@ -17,9 +17,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
         {
-            var products = await _productService.GetAllProducts();
+
+            var products = await _productService.GetAllProducts(_page, _size, _order);
             return Ok(products);
         }
 
@@ -89,9 +90,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         }
 
         [HttpGet("category/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category)
+        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
         {
-            var products = await _productService.GetProductByCategory(category);
+            var products = await _productService.GetProductByCategory(category, _page, _size, _order);
             return Ok(products);
         }
     }
