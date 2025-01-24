@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
@@ -15,9 +16,9 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public string Description { get; set; }
         public string Category { get; set; }
         public string Image {  get; set; }
-        public Rating Rating { get; set; }
-        
-      
+        public Rating Rating { get; set; } = new Rating();
+
+
     }
 }
 

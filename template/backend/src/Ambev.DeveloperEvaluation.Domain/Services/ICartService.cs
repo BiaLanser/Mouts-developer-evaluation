@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.DTOs;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Services
 {
     public interface ICartService
     {
-        Task<IEnumerable<Cart>> GetAllCarts();
+        Task<PaginationDto<Cart>> GetAllCarts(int page, int size, string order);
         Task<Cart> GetCartById(int id);
         Task<Cart> AddCart(Cart cart);
         Task<Cart> UpdateCart(int id, Cart cart);

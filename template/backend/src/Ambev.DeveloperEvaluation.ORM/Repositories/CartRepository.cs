@@ -47,6 +47,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         public async Task<IEnumerable<Cart>> GetAllCarts()
         {
             return await _context.Carts
+                             .Where(c => c.Products.Any())
                              .Include(c => c.Products)
                              .ToListAsync();
         }

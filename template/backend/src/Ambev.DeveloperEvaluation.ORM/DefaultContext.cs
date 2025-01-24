@@ -14,7 +14,6 @@ public class DefaultContext : DbContext
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartProduct> CartProducts { get; set; }
     public DbSet<Sale> Sales { get; set; }
-    public DbSet<SaleItem> SaleItems { get; set; }
 
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {
@@ -26,44 +25,63 @@ public class DefaultContext : DbContext
         modelBuilder.Entity<Product>().OwnsOne(p => p.Rating);
 
         //CART 
-        modelBuilder.Entity<CartProduct>()
-            .HasKey(cp => cp.Id);
+        modelBuilder.Entity<CartProduct>(entity =>
+        {
+            entity.HasKey(p => p.Id);
 
-        modelBuilder.Entity<CartProduct>()
-            .HasOne(cp => cp.Cart)
+            entity.HasOne(cp => cp.Cart)
             .WithMany(c => c.Products)
             .HasForeignKey(cp => cp.CartId)
+            .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("FK_CartProduct_Cart_CartId");
 
-        modelBuilder.Entity<CartProduct>()
-            .HasOne(cp => cp.Product)
+            entity.HasOne(cp => cp.Product)
             .WithMany()
             .HasForeignKey(cp => cp.ProductId)
+            .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("FK_CartProduct_Product_ProductId");
+        });
 
         //SALE
-        modelBuilder.Entity<Sale>()
-            .HasMany(s => s.Items)
-            .WithOne(si => si.Sale)
-            .HasForeignKey(si => si.SaleId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Sale>(entity =>
+        {
+            entity.HasOne(s => s.Cart)
+                //.WithOne() 
+                //.HasForeignKey<Sale>(s => s.CartId) 
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<SaleItem>()
-            .HasOne(si => si.Product)
-            .WithMany()
-            .HasForeignKey(si => si.ProductId)
-            .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(s => s.Items)
+                  .WithOne(si => si.Sale)
+                  .HasForeignKey(si => si.SaleId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        modelBuilder.Entity<Sale>()
-            .Ignore(s => s.TotalSaleAmount);
+        // SALEITEM
+        modelBuilder.Entity<SaleItem>(entity =>
+        {
+            entity.HasOne(si => si.Product)
+                  .WithMany()
+                  .HasForeignKey(si => si.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        modelBuilder.Entity<SaleItem>()
-            .Ignore(si => si.TotalAmount);
+        //USER
+
+        modelBuilder.Entity<User>(entity =>
+        { 
+            entity.Property(u => u.Role)
+                  .HasConversion<string>();
+            entity.Property(u => u.Status)
+                  .HasConversion<string>();
+        });
+
 
         base.OnModelCreating(modelBuilder);
     }
 
 }
+
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 {
     public DefaultContext CreateDbContext(string[] args)

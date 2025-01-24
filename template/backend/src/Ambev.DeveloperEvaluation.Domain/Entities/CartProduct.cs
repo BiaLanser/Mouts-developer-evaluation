@@ -11,19 +11,15 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
     public class CartProduct
     {
-        [JsonIgnore]
         public int Id { get; set; }
-        [JsonIgnore]
         public int CartId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
 
 
-        [JsonIgnore]
         [ValidateNever]
         public Cart Cart { get; set; }
 
-        [JsonIgnore]
         [ValidateNever]
         public Product Product { get; set; }
     }
