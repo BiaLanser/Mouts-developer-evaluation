@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Carts;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -17,9 +18,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             _cartService = cartService;
         }
 
-        //[Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
+        public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
         {
             var carts = await _cartService.GetAllCarts(_page, _size, _order);
             return Ok(carts);      

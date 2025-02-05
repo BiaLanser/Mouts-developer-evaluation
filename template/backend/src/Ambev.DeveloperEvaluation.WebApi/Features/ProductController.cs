@@ -1,12 +1,12 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Products;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -20,7 +20,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
+        public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
 
             var products = await _productService.GetAllProducts(_page, _size, _order);
@@ -99,7 +99,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "id asc")
+        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
             var products = await _productService.GetProductByCategory(category, _page, _size, _order);
             return Ok(products);
