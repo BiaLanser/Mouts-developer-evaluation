@@ -1,10 +1,7 @@
-﻿using Ambev.DeveloperEvaluation.Application.Carts;
-using Ambev.DeveloperEvaluation.Application.Sales;
+﻿using Ambev.DeveloperEvaluation.Application.Sales;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
-using Ambev.DeveloperEvaluation.ORM.Repositories;
-using Ambev.DeveloperEvaluation.WebApi.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
