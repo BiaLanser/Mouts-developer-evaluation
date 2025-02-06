@@ -5,7 +5,7 @@ using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -23,7 +23,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
         {
             var carts = await _cartService.GetAllCarts(_page, _size, _order);
-            return Ok(carts);      
+            return Ok(carts);
         }
 
 

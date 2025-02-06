@@ -2,19 +2,27 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Services;
+using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
         private readonly IProductService _productService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IMediator mediator, IMapper mapper, IProductService productService)
         {
+            _mediator = mediator;
+            _mapper = mapper;
             _productService = productService;
         }
 
@@ -37,27 +45,28 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
             return Ok(product);
         }
-
+        /*
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] CreateProductDto createProductDto)
+        public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest request, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var validator = new CreateProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
-            var product = new Product
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var command = _mapper.Map<CreateProductCommand>(request);
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Created(string.Empty, new ApiResponseWithData<CreateProductResponse>
             {
-                Title = createProductDto.Title,
-                Price = createProductDto.Price,
-                Description = createProductDto.Description,
-                Category = createProductDto.Category,
-                Image = createProductDto.Image,
-                Rating = createProductDto.Rating
-            };
-
-            await _productService.AddProduct(product);
-            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+                Success = true,
+                Message = "Product created successfully",
+                Data = _mapper.Map<CreateProductResponse>(response)
+            });
         }
+        */
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
@@ -89,7 +98,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
         {
@@ -97,7 +106,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
             return Ok(categories);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
         public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {

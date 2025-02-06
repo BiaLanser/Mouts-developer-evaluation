@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
     [Authorize]
     [ApiController]
@@ -18,7 +18,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
         private readonly ISaleRepository _saleRepository;
         private readonly ILogger<SaleController> _logger;
         private readonly ICartService _cartService;
-        public SaleController(ISaleService saleService, IProductRepository productRepository, ISaleRepository saleRepository, ICartService cartService,ILogger<SaleController> logger)
+        public SaleController(ISaleService saleService, IProductRepository productRepository, ISaleRepository saleRepository, ICartService cartService, ILogger<SaleController> logger)
         {
             _saleService = saleService;
             _productRepository = productRepository;
@@ -85,7 +85,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
                     IsCancelled = false,
                     CartId = createSale.CartId
                 };
-                
+
                 foreach (var cp in cart.Products)
                 {
                     _logger.LogInformation($"Processing cart product: ProductId {cp.ProductId}, Quantity {cp.Quantity}");
@@ -102,7 +102,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
                         };
                         sale.Items.Add(saleItem);
                     }
-                } 
+                }
 
 
                 var createdSale = await _saleService.AddSale(sale);
@@ -282,4 +282,4 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features
 
 
     }
-} 
+}
