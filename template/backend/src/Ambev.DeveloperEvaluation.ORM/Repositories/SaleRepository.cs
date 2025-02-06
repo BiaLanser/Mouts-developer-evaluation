@@ -2,11 +2,6 @@
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories
 {
@@ -23,7 +18,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
         public async Task<Sale> AddSale(Sale sale)
         {
-            try  //excliir
+            try 
             {
                 await _context.Sales.AddAsync(sale);
                 await _context.SaveChangesAsync();

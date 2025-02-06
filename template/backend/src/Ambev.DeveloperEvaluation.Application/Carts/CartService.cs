@@ -2,12 +2,7 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Application.Carts;
 
@@ -49,29 +44,29 @@ public class CartService : ICartService
         return await _cartRepository.DeleteCart(id);
     }
 
-    public async Task<PaginationDto<Cart>> GetAllCarts(int page, int size, string order)
+    public async Task<PaginationDto<Cart>> GetAllCarts(int page, int size, CartSortOrder order)
     {
         var carts = await _cartRepository.GetAllCarts();
 
         int totalItems = carts.Count();
         int totalPages = (int)Math.Ceiling(totalItems / (double)size);
 
-        if (order == "id asc")
+        switch (order)
         {
-            carts = carts.OrderBy(c => c.Id).ToList();
+            case CartSortOrder.IdAsc:
+                carts = carts.OrderBy(c => c.Id).ToList();
+                break;
+            case CartSortOrder.IdDesc:
+                carts = carts.OrderByDescending(c => c.Id).ToList();
+                break;
+            case CartSortOrder.UserIdAsc:
+                carts = carts.OrderBy(c => c.UserId).ToList();
+                break;
+            case CartSortOrder.UserIdDesc:
+                carts = carts.OrderByDescending(c => c.UserId).ToList();
+                break;
         }
-        else if (order == "id desc")
-        {
-            carts = carts.OrderByDescending(c => c.Id).ToList();
-        }
-        else if (order == "userId asc")
-        {
-            carts = carts.OrderBy(c => c.UserId).ToList();
-        }
-        else if (order == "userId desc")
-        {
-            carts = carts.OrderByDescending(c => c.UserId).ToList();
-        }
+
 
         var paginatedCarts = carts
             .Skip((page - 1) * size)

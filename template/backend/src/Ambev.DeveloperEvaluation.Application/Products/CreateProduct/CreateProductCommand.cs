@@ -1,13 +1,9 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Products
+namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
 {
-    public class CreateProductDto
+    public class CreateProductCommand : IRequest<CreateProductResult>
     {
         public string Title { get; set; }
         public decimal Price { get; set; }
