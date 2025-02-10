@@ -1,16 +1,15 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
-using Ambev.DeveloperEvaluation.Domain.DTOs;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Application.Products
-{
+{/*
     public class ProductService : IProductService
     {
 
         private readonly IProductRepository _productRepository;
-        /*
+        
        public ProductService(IProductRepository productRepository)
        {
            _productRepository = productRepository;
@@ -153,5 +152,5 @@ namespace Ambev.DeveloperEvaluation.Application.Products
             await _productRepository.UpdateProduct(product);
         } */
 
-    }
+//}
 }

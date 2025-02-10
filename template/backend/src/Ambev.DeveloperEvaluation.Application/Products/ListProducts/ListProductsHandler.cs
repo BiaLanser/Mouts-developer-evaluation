@@ -1,21 +1,19 @@
-﻿using Ambev.DeveloperEvaluation.Domain.DTOs;
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Enums;
+﻿using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Products.ListProduct
 {
-    public class ListProductHandler : IRequestHandler<ListProductQuery, ListProductResult>
+    public class ListProductsHandler : IRequestHandler<ListProductsQuery, ListProductsResult>
     {
         private readonly IProductRepository _productRepository;
 
-        public ListProductHandler(IProductRepository productRepository)
+        public ListProductsHandler(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
 
-        public async Task<ListProductResult> Handle(ListProductQuery request, CancellationToken cancellationToken)
+        public async Task<ListProductsResult> Handle(ListProductsQuery request, CancellationToken cancellationToken)
         {
             var products = await _productRepository.GetAllProducts();
             var productList = products.ToList();
@@ -47,14 +45,14 @@ namespace Ambev.DeveloperEvaluation.Application.Products.ListProduct
             }
 
             // Paginação
-            var paginatedProducts = products
+            var paginatedProducts = productList
                 .Skip((request.Page - 1) * request.Size)
                 .Take(request.Size)
                 .ToList();
 
-            return new ListProductResult
+            return new ListProductsResult
             {
-                Products = productList,
+                Products = paginatedProducts,
                 TotalItems = totalItems,
                 TotalPages = totalPages,
                 CurrentPage = request.Page

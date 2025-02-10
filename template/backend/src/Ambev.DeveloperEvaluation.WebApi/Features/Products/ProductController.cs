@@ -33,7 +33,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
 
-            var query = new ListProductQuery { Page = _page, Size = _size, Order = _order };
+            var query = new ListProductsQuery { Page = _page, Size = _size, Order = _order };
             var products = await _mediator.Send(query);
             return Ok(products);
         }

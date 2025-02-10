@@ -17,15 +17,15 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
             _mapper = mapper;
         }
 
-        public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
+        public async Task<CreateProductResult> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var validator = new CreateProductCommandValidator();
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var product = _mapper.Map<Product>(command);
+            var product = _mapper.Map<Product>(request);
 
             var createdProduct = _productRepository.AddProduct(product);
 

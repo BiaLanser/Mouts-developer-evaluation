@@ -5,9 +5,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts
 {
     public class ListProductProfile : Profile
     {
-        public ListProductProfile() 
+        public ListProductProfile()
         {
-            CreateMap<ListProductResult, ListProductResponse>();
-
+            CreateMap<ListProductsResult, ListProductResponse>();
         }
+    }
 }

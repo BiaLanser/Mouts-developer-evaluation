@@ -11,3 +11,4 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct
                 .ConstructUsing(id => new DeleteProductQuery(id));
         }
     }
+}
