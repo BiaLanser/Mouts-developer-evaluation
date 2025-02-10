@@ -1,8 +1,8 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
+namespace Ambev.DeveloperEvaluation.Application.Products.GetProduct
 {
-    public class GetCategoryResponse
+    public class GetProductResult
     {
         public int Id { get; set; }
         public string Title { get; set; }

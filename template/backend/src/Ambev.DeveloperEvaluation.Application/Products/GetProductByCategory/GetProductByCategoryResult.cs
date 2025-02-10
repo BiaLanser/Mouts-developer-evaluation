@@ -1,8 +1,8 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.Application.Products.ListProduct
+namespace Ambev.DeveloperEvaluation.Application.Products.GetProductByCategory
 {
-    public class ListProductResult
+    public class GetProductByCategoryResult
     {
         public List<Product> Products { get; set; } = new();
         public int TotalItems { get; set; }

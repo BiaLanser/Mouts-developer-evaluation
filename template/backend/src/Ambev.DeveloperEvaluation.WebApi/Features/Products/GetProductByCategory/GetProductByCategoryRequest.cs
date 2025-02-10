@@ -1,6 +1,7 @@
 ﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
 {
-    public class GetCategoryValidator
+    public class GetProductByCategoryRequest
     {
+        public string Category;
     }
 }

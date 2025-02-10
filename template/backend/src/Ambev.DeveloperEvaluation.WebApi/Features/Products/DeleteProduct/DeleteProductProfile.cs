@@ -1,6 +1,13 @@
-﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct
+﻿using Ambev.DeveloperEvaluation.Application.Products.DeleteProduct;
+using AutoMapper;
+
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct
 {
-    public class DeleteProductProfile
+    public class DeleteProductProfile : Profile
     {
+        public DeleteProductProfile()
+        {
+            CreateMap<int, DeleteProductQuery>()
+                .ConstructUsing(id => new DeleteProductQuery(id));
+        }
     }
-}

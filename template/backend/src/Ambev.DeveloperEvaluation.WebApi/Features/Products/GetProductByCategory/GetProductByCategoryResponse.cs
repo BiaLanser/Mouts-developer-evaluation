@@ -1,8 +1,8 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
 {
-    public class UpdateProductRequest
+    public class GetProductByCategoryResponse
     {
         public int Id { get; set; }
         public string Title { get; set; }

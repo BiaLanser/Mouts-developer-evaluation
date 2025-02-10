@@ -1,29 +1,37 @@
-﻿using Ambev.DeveloperEvaluation.Domain.DTOs;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Enums;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+using AutoMapper;
 using MediatR;
+using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
+using FluentValidation;
 
-namespace Ambev.DeveloperEvaluation.Application.Products.ListProduct
+namespace Ambev.DeveloperEvaluation.Application.Products.GetProductByCategory
 {
-    public class ListProductHandler : IRequestHandler<ListProductQuery, ListProductResult>
+    public class GetProductByCategoryHandler : IRequestHandler<GetProductByCategoryQuery, GetProductByCategoryResult>
     {
         private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ListProductHandler(IProductRepository productRepository)
+        public GetProductByCategoryHandler(IProductRepository productRepository, IMapper mapper)
         {
             _productRepository = productRepository;
+            _mapper = mapper;
         }
 
-        public async Task<ListProductResult> Handle(ListProductQuery request, CancellationToken cancellationToken)
+        public async Task<GetProductByCategoryResult> Handle(GetProductByCategoryQuery request, CancellationToken cancellationToken)
         {
-            var products = await _productRepository.GetAllProducts();
+            var validator = new GetProductByCategoryQueryValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var products = await _productRepository.GetProductByCategory(request.Category);
             var productList = products.ToList();
 
             int totalItems = productList.Count();
             int totalPages = (int)Math.Ceiling(totalItems / (double)request.Size);
 
-            // Ordenação
             switch (request.Order)
             {
                 case ProductSortOrder.IdAsc:
@@ -52,7 +60,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.ListProduct
                 .Take(request.Size)
                 .ToList();
 
-            return new ListProductResult
+            return new GetProductByCategoryResult
             {
                 Products = productList,
                 TotalItems = totalItems,

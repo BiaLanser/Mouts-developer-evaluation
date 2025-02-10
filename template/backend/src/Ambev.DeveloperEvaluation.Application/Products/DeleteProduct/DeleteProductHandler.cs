@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Products.DeleteProduct
 {
-    public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, DeleteProductResponse>
+    public class DeleteProductHandler : IRequestHandler<DeleteProductQuery, DeleteProductResponse>
     {
         private readonly IProductRepository _productRepository;
 
@@ -13,20 +13,20 @@ namespace Ambev.DeveloperEvaluation.Application.Products.DeleteProduct
             _productRepository = productRepository;
         }
 
-        public async Task<DeleteProductResponse> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
+        public async Task<DeleteProductResponse> Handle(DeleteProductQuery request, CancellationToken cancellationToken)
         {
-            var validator = new DeleteProductCommandValidator();
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validator = new DeleteProductQueryValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var product = await _productRepository.GetProductById(command.Id);
+            var product = await _productRepository.GetProductById(request.Id);
 
             if (product == null)
                 return new DeleteProductResponse { Success = false };
 
-            await _productRepository.DeleteProduct(command.Id);
+            await _productRepository.DeleteProduct(request.Id);
 
             return new DeleteProductResponse { Success = true };
         }

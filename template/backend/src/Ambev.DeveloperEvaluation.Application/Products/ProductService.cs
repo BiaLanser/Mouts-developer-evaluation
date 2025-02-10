@@ -35,7 +35,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products
        {
            await GetProductById(id);
            await _productRepository.DeleteProduct(id);
-       }*/
+       }
 
         public async Task<PaginationDto<Product>> GetAllProducts(int page, int size, ProductSortOrder order)
         {
@@ -151,6 +151,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products
             }
             await GetProductById(product.Id);
             await _productRepository.UpdateProduct(product);
-        } 
+        } */
+
     }
 }
