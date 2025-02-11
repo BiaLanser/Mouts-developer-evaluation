@@ -8,7 +8,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategor
     {
         public GetProductByCategoryProfile()
         {
-            CreateMap<GetProductByCategoryRequest, GetProductByCategoryQuery>()
+            CreateMap<GetProductByCategoryRequest, GetProductByCategoryQuery>();
             CreateMap<GetProductByCategoryResult, GetProductByCategoryResponse>();
         }
     }

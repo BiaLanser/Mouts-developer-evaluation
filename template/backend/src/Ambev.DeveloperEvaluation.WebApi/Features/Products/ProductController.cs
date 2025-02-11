@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
+﻿using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.DeleteProduct;
 using Ambev.DeveloperEvaluation.Application.Products.GetProduct;
 using Ambev.DeveloperEvaluation.Application.Products.GetProductByCategory;
@@ -9,7 +8,6 @@ using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct;
-using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
@@ -22,12 +20,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-        public ProductsController(IMediator mediator, IMapper mapper)
+        public ProductController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
             _mapper = mapper;
@@ -129,7 +127,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetProductByCategory(string category, CancellationToken cancellationToken, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
             var request = new GetProductByCategoryRequest { Category = category };
             var validator = new GetProductByCategoryRequestValidator();

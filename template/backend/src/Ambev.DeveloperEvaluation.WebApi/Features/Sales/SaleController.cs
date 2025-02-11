@@ -2,6 +2,8 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,18 +15,13 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
     [Route("api/[controller]")]
     public class SaleController : ControllerBase
     {
-        private readonly ISaleService _saleService;
-        private readonly IProductRepository _productRepository;
-        private readonly ISaleRepository _saleRepository;
-        private readonly ILogger<SaleController> _logger;
-        private readonly ICartService _cartService;
-        public SaleController(ISaleService saleService, IProductRepository productRepository, ISaleRepository saleRepository, ICartService cartService, ILogger<SaleController> logger)
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+
+        public SaleController(IMediator mediator, IMapper mapper)
         {
-            _saleService = saleService;
-            _productRepository = productRepository;
-            _saleRepository = saleRepository;
-            _cartService = cartService;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = "Admin, Manager")]

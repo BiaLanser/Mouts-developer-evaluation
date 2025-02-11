@@ -1,6 +1,6 @@
-﻿namespace Ambev.DeveloperEvaluation.Application.Sales
+﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale
 {
-    public class CreateSaleDto
+    public class CreateSaleRequest
     {
         public int CustomerId { get; set; }
         public string Branch { get; set; }

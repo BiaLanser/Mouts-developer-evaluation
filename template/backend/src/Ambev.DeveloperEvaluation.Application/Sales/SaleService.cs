@@ -19,7 +19,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
             _productRepository = productRepository;
             _logger = logger;
         }
-
+        /*
         public async Task<Sale> AddSale(Sale sale)
         {
             try
@@ -114,7 +114,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
 
             return sale;
         }
-
+        
         private (decimal totalSaleAmount, decimal totalDiscountt) CalculateDiscounts(IEnumerable<SaleItem> saleItems)
         {
             decimal totalSaleAmount = 0;
@@ -143,6 +143,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
             }
 
             return (Math.Round(totalSaleAmount, 2), Math.Round(totalDiscount, 2));
-        }
+        } */
     }
 }
