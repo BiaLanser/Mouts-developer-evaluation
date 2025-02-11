@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
+﻿using System.Threading;
+using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.Application.Products.DeleteProduct;
 using Ambev.DeveloperEvaluation.Application.Products.GetProduct;
 using Ambev.DeveloperEvaluation.Application.Products.GetProductByCategory;
@@ -7,6 +8,10 @@ using Ambev.DeveloperEvaluation.Application.Products.ListProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using AutoMapper;
 using MediatR;
@@ -32,7 +37,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         [HttpGet]
         public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
-
             var query = new ListProductsQuery { Page = _page, Size = _size, Order = _order };
             var products = await _mediator.Send(query);
             return Ok(products);
@@ -40,8 +44,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        public async Task<IActionResult> GetProductById(int id, CancellationToken cancellationToken)
         {
+            var request = new GetProductRequest { Id = id };
+            var validator = new GetProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
             var query = new GetProductQuery(id);
             var product = await _mediator.Send(query);
             if (product == null)
@@ -71,6 +82,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
         {
+            var validator = new UpdateProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
             if (id != request.Id)
                 return BadRequest(new { message = "Product ID mismatch" });
 
@@ -85,8 +102,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id, CancellationToken cancellationToken)
         {
+            var request = new DeleteProductRequest { Id = id };
+            var validator = new DeleteProductRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
             var result = await _mediator.Send(new DeleteProductQuery(id));
 
             if (!result.Success)
@@ -105,11 +129,19 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
+        public async Task<IActionResult> GetProductByCategory(string category, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc, CancellationToken cancellationToken)
         {
+            var request = new GetProductByCategoryRequest { Category = category };
+            var validator = new GetProductByCategoryRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
             var query = new GetProductByCategoryQuery { Category = category, Page = _page, Size = _size, Order = _order };
             var products = await _mediator.Send(query);
             return Ok(products);
         }
     }
+
 }

@@ -1,4 +1,4 @@
-﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
+﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory
 {
     public class GetProductByCategoryRequest
     {

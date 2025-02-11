@@ -1,6 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory
 {
     public class GetProductByCategoryResponse
     {

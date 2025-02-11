@@ -4,6 +4,17 @@ using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using MediatR;
+using Ambev.DeveloperEvaluation.Application.Carts.ListCarts;
+using Ambev.DeveloperEvaluation.Application.Carts.GetCart;
+using Ambev.DeveloperEvaluation.WebApi.Features.Carts.GetCart;
+using Ambev.DeveloperEvaluation.WebApi.Features.Carts.CreateCart;
+using Ambev.DeveloperEvaluation.Application.Carts.CreateCart;
+using Ambev.DeveloperEvaluation.WebApi.Features.Carts.UpdateCart;
+using Ambev.DeveloperEvaluation.Application.Carts.UpdateCart;
+using Ambev.DeveloperEvaluation.Application.Carts.DeleteCart;
+using Ambev.DeveloperEvaluation.WebApi.Features.Carts.DeleteCart;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 {
@@ -11,126 +22,100 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
     [Route("api/[controller]")]
     public class CartController : ControllerBase
     {
-        private readonly ICartService _cartService;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public CartController(ICartService cartService)
+        public CartController(IMediator mediator, IMapper mapper)
         {
-            _cartService = cartService;
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
         {
-            var carts = await _cartService.GetAllCarts(_page, _size, _order);
+            var query = new ListCartsQuery { Page = _page, Size = _size, Order = _order };
+            var carts = await _mediator.Send(query);
             return Ok(carts);
         }
 
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var cart = await _cartService.GetCartById(id);
+            var request = new GetCartRequest { Id = id };
+            var validator = new GetCartRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var query = new GetCartQuery(id);
+            var cart = await _mediator.Send(query);
+
             if (cart == null)
-                return NotFound();
+                return NotFound(new { message = "Cart not found" });
 
-            var cartDto = new CartDto
-            {
-                Id = cart.Id,
-                UserId = cart.UserId,
-                Date = cart.Date,
-                Products = cart.Products.Select(cp => new CartProductDto
-                {
-                    ProductId = cp.ProductId,
-                    Quantity = cp.Quantity
-                }).ToList()
-            };
-
-            return Ok(cartDto);
+            return Ok(cart);
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateCartDto createCartDto)
+        public async Task<IActionResult> Create([FromBody] CreateCartRequest request, CancellationToken cancellationToken)
         {
-            if (createCartDto == null)
-                return BadRequest();
+            var validator = new CreateCartRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            var cart = new Cart
-            {
-                UserId = createCartDto.UserId,
-                Products = createCartDto.Products.Select(p => new CartProduct
-                {
-                    ProductId = p.ProductId,
-                    Quantity = p.Quantity
-                }).ToList(),
-                Date = DateTime.UtcNow
-            };
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-            var createdCart = await _cartService.AddCart(cart);
+            var command = _mapper.Map<CreateCartCommand>(request);
+            var response = await _mediator.Send(command);
 
-            var cartDto = new CartDto
-            {
-                Id = createdCart.Id,
-                UserId = createdCart.UserId,
-                Date = createdCart.Date,
-                Products = cart.Products.Select(cp => new CartProductDto
-                {
-                    ProductId = cp.ProductId,
-                    Quantity = cp.Quantity
-                }).ToList()
-            };
-            return CreatedAtAction(nameof(GetById), new { id = createdCart.Id }, cartDto);
+            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CreateCartDto createCartDto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCartRequest request, CancellationToken cancellationToken)
         {
-            if (createCartDto == null)
-                return BadRequest();
+            var validator = new UpdateCartRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            var cartToUpdate = new Cart
-            {
-                UserId = createCartDto.UserId,
-                Products = createCartDto.Products.Select(p => new CartProduct
-                {
-                    ProductId = p.ProductId,
-                    Quantity = p.Quantity
-                }).ToList(),
-                Date = DateTime.UtcNow
-            };
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-            var updatedCart = await _cartService.UpdateCart(id, cartToUpdate);
+            if (id != request.Id)
+                return BadRequest(new { message = "Cart ID mismatch" });
 
-            var cartDto = new CartDto
-            {
-                Id = updatedCart.Id,
-                UserId = updatedCart.UserId,
-                Date = updatedCart.Date,
-                Products = cartToUpdate.Products.Select(cp => new CartProductDto
-                {
-                    ProductId = cp.ProductId,
-                    Quantity = cp.Quantity
-                }).ToList()
-            };
+            var command = _mapper.Map<UpdateCartCommand>(request);
+            var response = await _mediator.Send(command);
 
-            if (updatedCart == null)
-                return NotFound();
+            if (response == null)
+                return NotFound(new { message = "Cart not found" });
 
-            return Ok(cartDto);
+            return Ok(response);
         }
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            var success = await _cartService.DeleteCart(id);
-            if (!success)
-                return NotFound();
+            var request = new DeleteCartRequest { Id = id };
+            var validator = new DeleteCartRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            return Ok(new { message = "Cart deleted successfully." });
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var result = await _mediator.Send(new DeleteCartQuery(id));
+
+            if (!result.Success)
+                return NotFound(new { message = "Cart not found" });
+
+            return NoContent();
         }
 
     }

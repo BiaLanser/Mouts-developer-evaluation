@@ -1,7 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Products.GetProductByCategory;
 using FluentValidation;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetCategory
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory
 {
     public class GetProductByCategoryRequestValidator : AbstractValidator<GetProductByCategoryRequest>
     {
