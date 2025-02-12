@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -36,9 +30,10 @@ namespace Ambev.DeveloperEvaluation.Application.Carts.UpdateCart
             if (existingCart == null)
                 throw new KeyNotFoundException($"Cart with ID {request.Id} not found");
 
-            var cart = _mapper.Map<Cart>(request);
+            _mapper.Map(request, existingCart);
+            existingCart.Date = DateTime.UtcNow;
 
-            var updatedCart = await _cartRepository.UpdateCart(request.Id, cart);
+            var updatedCart = await _cartRepository.UpdateCart(request.Id, existingCart);
 
             return _mapper.Map<UpdateCartResult>(updatedCart);
         }

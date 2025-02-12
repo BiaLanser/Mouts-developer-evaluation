@@ -59,6 +59,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
                 sale.TotalSaleAmount = totalSaleAmount;
                 sale.Discount = totalDiscount;
+                sale.SaleDate = DateTime.UtcNow;
+                sale.IsCancelled = false;
 
                 var createdSale = await _saleRepository.AddSale(sale);
                 return _mapper.Map<CreateSaleResult>(createdSale);

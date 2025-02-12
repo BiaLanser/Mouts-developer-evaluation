@@ -1,7 +1,15 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales;
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.Domain.Services;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
+using Ambev.DeveloperEvaluation.Application.Sales.ListSale;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.DeleteSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,257 +34,103 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SaleDto>>> GetAllSales()
+        public async Task<ActionResult<IEnumerable<ListSaleResponse>>> GetAllSales()
         {
-            try
-            {
-                var sales = await _saleService.GetAllSales();
-
-                if (!sales.Any())
-                    return NoContent();
-
-                var salesDto = sales.Select(sale => new SaleDto
-                {
-                    SaleNumber = sale.SaleNumber,
-                    Date = sale.SaleDate,
-                    CustomerId = sale.CustomerId,
-                    Branch = sale.Branch,
-                    IsCancelled = sale.IsCancelled,
-                    SaleItems = sale.Items.Select(item => new SaleItemDTO
-                    {
-                        ProductId = item.ProductId,
-                        ProductName = item.ProductName,
-                        UnitPrice = item.UnitPrice,
-                        Quantity = item.Quantity,
-                        TotalAmount = item.TotalAmount
-                    }).ToList(),
-                    Discount = sale.Discount,
-                    TotalSaleAmount = sale.TotalSaleAmount
-                }).ToList();
-
-                return Ok(salesDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching all sales");
-                return StatusCode(500, "Internal error while fetching sales");
-            }
+            var query = new ListSaleQuery();
+            var sales = await _mediator.Send(query);
+            return Ok(sales);
         }
 
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost]
-        public async Task<ActionResult<SaleDto>> CreateSale([FromBody] CreateSaleDto createSale)
+        public async Task<ActionResult<CreateSaleResponse>> CreateSale([FromBody] CreateSaleRequest request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var cart = await _cartService.GetCartById(createSale.CartId);
-                if (cart == null)
-                    return NotFound("Cart not found");
+            var validator = new CreateSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-                var sale = new Sale
-                {
-                    CustomerId = createSale.CustomerId,
-                    Branch = createSale.Branch,
-                    SaleDate = DateTime.UtcNow,
-                    IsCancelled = false,
-                    CartId = createSale.CartId
-                };
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-                foreach (var cp in cart.Products)
-                {
-                    _logger.LogInformation($"Processing cart product: ProductId {cp.ProductId}, Quantity {cp.Quantity}");
-
-                    var product = await _productRepository.GetProductById(cp.ProductId);
-                    if (product != null)
-                    {
-                        var saleItem = new SaleItem
-                        {
-                            ProductId = cp.ProductId,
-                            Quantity = cp.Quantity,
-                            UnitPrice = product.Price,
-                            TotalAmount = cp.Quantity * product.Price
-                        };
-                        sale.Items.Add(saleItem);
-                    }
-                }
-
-
-                var createdSale = await _saleService.AddSale(sale);
-
-                var saleDto = new SaleDto
-                {
-                    SaleNumber = createdSale.SaleNumber,
-                    Date = createdSale.SaleDate,
-                    CustomerId = createdSale.CustomerId,
-                    Branch = createdSale.Branch,
-                    IsCancelled = createdSale.IsCancelled,
-                    SaleItems = createdSale.Items.Select(item => new SaleItemDTO
-                    {
-                        ProductId = item.ProductId,
-                        ProductName = item.ProductName,
-                        UnitPrice = item.UnitPrice,
-                        Quantity = item.Quantity,
-                        TotalAmount = item.TotalAmount
-                    }).ToList(),
-                    Discount = createdSale.Discount,
-                    TotalSaleAmount = createdSale.TotalSaleAmount
-                };
-
-                return CreatedAtAction(nameof(GetSaleBySaleNumber), new { saleNumber = createdSale.SaleNumber }, saleDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error to create sale");
-                return StatusCode(500, "Internal error while processing the sale");
-            }
+            var command = _mapper.Map<CreateSaleCommand>(request);
+            var sale = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetSaleBySaleNumber), new { saleNumber = sale.SaleNumber }, sale);
 
         }
 
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{saleNumber}")]
-        public async Task<ActionResult<SaleDto>> GetSaleBySaleNumber(int saleNumber)
+        public async Task<ActionResult<GetSaleResponse>> GetSaleBySaleNumber(int saleNumber, CancellationToken cancellationToken)
         {
-            var sale = await _saleService.GetSaleBySaleNumber(saleNumber);
+            var request = new GetSaleRequest { SaleNumber = saleNumber };
+            var validator = new GetSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var query = new GetSaleQuery(saleNumber);
+            var sale = await _mediator.Send(query);
 
             if (sale == null)
-                return NotFound();
+                return NotFound(new { message = "Sale not found" });
 
-            var saleDto = new SaleDto
-            {
-                SaleNumber = sale.SaleNumber,
-                Date = sale.SaleDate,
-                CustomerId = sale.CustomerId,
-                Branch = sale.Branch,
-                IsCancelled = sale.IsCancelled,
-                SaleItems = sale.Items.Select(item => new SaleItemDTO
-                {
-                    ProductId = item.ProductId,
-                    ProductName = item.ProductName,
-                    UnitPrice = item.UnitPrice,
-                    Quantity = item.Quantity,
-                    TotalAmount = item.TotalAmount
-                }).ToList(),
-                Discount = sale.Discount,
-                TotalSaleAmount = sale.TotalSaleAmount
-            };
-
-            return Ok(saleDto);
+            return Ok(sale);
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPatch("cancel/{saleNumber}")]
-        public async Task<IActionResult> CancelSale(int saleNumber)
+        public async Task<IActionResult> CancelSale(int saleNumber, CancellationToken cancellationToken)
         {
-            var sale = await _saleService.CancelSale(saleNumber);
+            var request = new CancelSaleRequest { SaleNumber = saleNumber };
+            var validator = new CancelSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+
+            var command = new CancelSaleQuery(saleNumber);
+            var sale = await _mediator.Send(command);
 
             if (sale == null)
-                return NotFound();
+                return NotFound(new { message = "Sale not found" });
 
-            var saleDto = new SaleDto
-            {
-                SaleNumber = sale.SaleNumber,
-                Date = sale.SaleDate,
-                CustomerId = sale.CustomerId,
-                Branch = sale.Branch,
-                IsCancelled = sale.IsCancelled,
-                SaleItems = sale.Items.Select(item => new SaleItemDTO
-                {
-                    ProductId = item.ProductId,
-                    ProductName = item.ProductName,
-                    UnitPrice = item.UnitPrice,
-                    Quantity = item.Quantity,
-                    TotalAmount = item.TotalAmount
-                }).ToList(),
-                Discount = sale.Discount,
-                TotalSaleAmount = sale.TotalSaleAmount
-            };
-
-            return Ok(saleDto);
+            return Ok(sale);
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{saleNumber}")]
-        public async Task<ActionResult<SaleDto>> UpdateSale(int saleNumber, [FromBody] CreateSaleDto updateSaleDto)
+        public async Task<ActionResult<UpdateSaleResponse>> UpdateSale(int saleNumber, [FromBody] UpdateSaleRequest request, CancellationToken cancellationToken)
         {
-            var sale = await _saleRepository.GetSaleBySaleNumber(saleNumber);
+            var validator = new UpdateSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            if (sale == null)
-                return NotFound();
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-            sale.CustomerId = updateSaleDto.CustomerId;
-            sale.Branch = updateSaleDto.Branch;
+            var command = _mapper.Map<UpdateSaleCommand>(request);
+            command.SaleNumber = saleNumber;
+            var updatedSale = await _mediator.Send(command);
 
-            if (sale.CartId != updateSaleDto.CartId)
-            {
-                sale.Items.Clear();
-
-                var cart = await _cartService.GetCartById(updateSaleDto.CartId);
-                if (cart == null)
-                    return NotFound("Cart not found");
-
-                foreach (var cp in cart.Products)
-                {
-                    var product = await _productRepository.GetProductById(cp.ProductId);
-                    if (product != null)
-                    {
-                        var saleItem = new SaleItem
-                        {
-                            ProductId = cp.ProductId,
-                            ProductName = product.Title,
-                            Quantity = cp.Quantity,
-                            UnitPrice = product.Price,
-                            TotalAmount = cp.Quantity * product.Price
-                        };
-                        sale.Items.Add(saleItem);
-                    }
-                    else
-                    {
-                        _logger.LogWarning($"Product with ID {cp.ProductId} not found");
-                        continue;
-                    }
-                }
-            }
-
-            var updatedSale = await _saleService.UpdateSale(sale);
-
-            var saleDto = new SaleDto
-            {
-                SaleNumber = updatedSale.SaleNumber,
-                Date = updatedSale.SaleDate,
-                CustomerId = updatedSale.CustomerId,
-                Branch = updatedSale.Branch,
-                IsCancelled = updatedSale.IsCancelled,
-                SaleItems = updatedSale.Items.Select(item => new SaleItemDTO
-                {
-                    ProductId = item.ProductId,
-                    ProductName = item.ProductName,
-                    UnitPrice = item.UnitPrice,
-                    Quantity = item.Quantity,
-                    TotalAmount = item.TotalAmount
-                }).ToList(),
-                Discount = updatedSale.Discount,
-                TotalSaleAmount = updatedSale.TotalSaleAmount
-            };
-
-            return Ok(saleDto);
+            return Ok(updatedSale);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{saleNumber}")]
         public async Task<IActionResult> DeleteSale(int saleNumber)
         {
-            var sale = await _saleRepository.GetSaleBySaleNumber(saleNumber);
+            var request = new DeleteSaleRequest { SaleNumber = saleNumber};
+            var validator = new DeleteSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            if (sale == null)
-                return NotFound();
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-            await _saleService.DeleteSale(saleNumber);
-
+            var command = new DeleteSaleQuery(saleNumber);
+            await _mediator.Send(command);
             return NoContent();
         }
-
 
     }
 }

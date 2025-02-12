@@ -28,6 +28,8 @@ namespace Ambev.DeveloperEvaluation.Application.Carts.CreateCart
                 throw new ValidationException(validationResult.Errors);
 
             var cart = _mapper.Map<Cart>(request);
+            cart.Date = DateTime.UtcNow;
+
             var createdCart = await _cartRepository.AddCart(cart);
 
             return _mapper.Map<CreateCartResult>(createdCart);
