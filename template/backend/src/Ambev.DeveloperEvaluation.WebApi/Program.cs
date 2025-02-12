@@ -1,12 +1,9 @@
 using Ambev.DeveloperEvaluation.Application;
-using Ambev.DeveloperEvaluation.Application.Sales;
-using Ambev.DeveloperEvaluation.Application.Carts;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
@@ -15,7 +12,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Text.Json.Serialization;
-using Ambev.DeveloperEvaluation.Application.Products;
 using Microsoft.OpenApi.Models;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
@@ -77,10 +73,10 @@ public class Program
             );
 
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IProductService, ProductService>();
+            //builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();
-            builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<ISaleService, SaleService>();
+            //builder.Services.AddScoped<ICartService, CartService>();
+            //builder.Services.AddScoped<ISaleService, SaleService>();
             builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
             builder.Services.AddJwtAuthentication(builder.Configuration);

@@ -1,5 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-
+/*
 namespace Ambev.DeveloperEvaluation.Domain.Services
 {
     public interface ISaleService
@@ -11,4 +11,4 @@ namespace Ambev.DeveloperEvaluation.Domain.Services
         Task DeleteSale(int id);
         Task<Sale> CancelSale(int id);
     }
-}
+}*/

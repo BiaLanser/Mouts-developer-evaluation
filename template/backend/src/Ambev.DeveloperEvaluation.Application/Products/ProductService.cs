@@ -1,10 +1,10 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿/*using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Application.Products
-{/*
+{
     public class ProductService : IProductService
     {
 
@@ -150,7 +150,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products
             }
             await GetProductById(product.Id);
             await _productRepository.UpdateProduct(product);
-        } */
+        } 
 
 //}
-}
+}*/

@@ -1,4 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿/*using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
             _productRepository = productRepository;
             _logger = logger;
         }
-        /*
+        
         public async Task<Sale> AddSale(Sale sale)
         {
             try
@@ -143,6 +143,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
             }
 
             return (Math.Round(totalSaleAmount, 2), Math.Round(totalDiscount, 2));
-        } */
+        } 
     }
-}
+}*/

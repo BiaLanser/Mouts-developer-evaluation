@@ -1,11 +1,11 @@
-﻿
+﻿/*
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Application.Carts;
-/*
+
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
