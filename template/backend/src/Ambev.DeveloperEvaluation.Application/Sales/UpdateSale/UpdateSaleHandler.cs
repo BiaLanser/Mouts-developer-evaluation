@@ -9,12 +9,16 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
     public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
+        private readonly ICartRepository _cartRepository;
+        private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly DiscountCalculator _discountCalculator;
 
-        public UpdateSaleHandler(ISaleRepository saleRepository, IMapper mapper, DiscountCalculator discountCalculator)
+        public UpdateSaleHandler(ISaleRepository saleRepository, ICartRepository cartRepository, IProductRepository productRepository, IMapper mapper, DiscountCalculator discountCalculator)
         {
             _saleRepository = saleRepository;
+            _cartRepository = cartRepository;
+            _productRepository = productRepository;
             _mapper = mapper;
             _discountCalculator = discountCalculator;
         }
@@ -33,13 +37,38 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             if (existingSale == null)
                 throw new KeyNotFoundException($"Sale with ID: {sale.SaleNumber} not found");
 
-            existingSale.SaleDate = sale.SaleDate;
-            existingSale.Items = sale.Items;
+
+            if (sale.CartId != existingSale.CartId)
+            {
+                var cart = await _cartRepository.GetCartById(sale.CartId);
+
+                if (cart == null || !cart.Products.Any())
+                    throw new InvalidOperationException("Sale must contain at least one item from the cart");
+
+                existingSale.Items = cart.Products.Select(product => new SaleItem
+                {
+                    ProductId = product.ProductId,
+                    Quantity = product.Quantity
+                }).ToList();
+
+                foreach (var saleItem in existingSale.Items)
+                {
+                    var product = await _productRepository.GetProductById(saleItem.ProductId);
+
+                    if (saleItem.Quantity > 20)
+                        throw new InvalidOperationException("You can only select up to 20 items");
+
+                    saleItem.UnitPrice = product.Price;
+                    saleItem.ProductName = product.Title;
+                }
+            }
 
             (decimal totalSaleAmount, decimal totalDiscount) = _discountCalculator.Calculate(sale.Items);
 
             existingSale.TotalSaleAmount = totalSaleAmount;
             existingSale.Discount = totalDiscount;
+            existingSale.SaleDate = sale.SaleDate;
+            existingSale.Items = sale.Items;
 
             var updatedSale = await _saleRepository.UpdateSale(existingSale);
 

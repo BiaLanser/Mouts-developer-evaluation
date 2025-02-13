@@ -12,14 +12,16 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IProductRepository _productRepository;
+        private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateSaleHandler> _logger;
         private readonly DiscountCalculator _discountCalculator;
 
-        public CreateSaleHandler(ISaleRepository saleRepository, IProductRepository productRepository, IMapper mapper, ILogger<CreateSaleHandler> logger, DiscountCalculator discountCalculator)
+        public CreateSaleHandler(ISaleRepository saleRepository, IProductRepository productRepository, ICartRepository cartRepository, IMapper mapper, ILogger<CreateSaleHandler> logger, DiscountCalculator discountCalculator)
         {
             _saleRepository = saleRepository;
             _productRepository = productRepository;
+            _cartRepository = cartRepository;
             _mapper = mapper;
             _logger = logger;
             _discountCalculator = discountCalculator;
@@ -37,9 +39,18 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
 
                 var sale = _mapper.Map<Sale>(request);
+                sale.Items = sale.Items ?? new List<SaleItem>();
 
-                if (sale.Items == null || !sale.Items.Any())
+                var cart = await _cartRepository.GetCartById(request.CartId);
+
+                if (cart == null || cart.Products == null || !cart.Products.Any())
                     throw new InvalidOperationException("Sale must contain at least one item");
+
+                sale.Items = cart.Products.Select(product => new SaleItem
+                {
+                    ProductId = product.ProductId,
+                    Quantity = product.Quantity
+                }).ToList();
 
                 decimal totalSaleAmount = 0;
                 decimal totalDiscount = 0;

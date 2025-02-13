@@ -6,7 +6,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
     {
         Task<IEnumerable<Product>> GetAllProducts();
         Task<Product> GetProductById(int id);
-        Task AddProduct(Product product);
+        Task<Product> AddProduct(Product product);
         Task UpdateProduct(Product product);
         Task DeleteProduct(int id);
         Task<IEnumerable<string>> GetCategories(); //buscar categorias

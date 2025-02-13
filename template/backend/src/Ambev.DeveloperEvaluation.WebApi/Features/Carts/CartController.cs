@@ -28,7 +28,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
         {
@@ -38,7 +38,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
         }
 
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+       // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
@@ -58,7 +58,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             return Ok(cart);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateCartRequest request, CancellationToken cancellationToken)
         {
@@ -74,7 +74,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+       // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCartRequest request, CancellationToken cancellationToken)
         {
@@ -95,8 +95,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 
             return Ok(response);
         }
-
-        [Authorize(Roles = "Admin, Manager")]
+        
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {

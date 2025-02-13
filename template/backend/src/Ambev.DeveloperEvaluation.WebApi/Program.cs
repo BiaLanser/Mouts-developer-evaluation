@@ -3,10 +3,8 @@ using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
-using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -65,19 +63,13 @@ public class Program
             });
 
             builder.Services.AddDbContext<DefaultContext>(options =>
-                options.UseNpgsql(
+                options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
                 ).EnableSensitiveDataLogging()
                 .LogTo(Console.WriteLine, LogLevel.Information)
             );
 
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            //builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<ICartRepository, CartRepository>();
-            //builder.Services.AddScoped<ICartService, CartService>();
-            //builder.Services.AddScoped<ISaleService, SaleService>();
-            builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 

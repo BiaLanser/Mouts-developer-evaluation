@@ -13,10 +13,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
             _context = context;
         }
 
-        public async Task AddProduct(Product product)
+        public async Task<Product> AddProduct(Product product)
         {
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
+            return product;
         }
 
         public async Task DeleteProduct(int id)

@@ -2,7 +2,9 @@
 
 namespace Ambev.DeveloperEvaluation.Domain.Repositories
 {
-    public interface ICartRepository
+   
+}
+ public interface ICartRepository
     {
         Task<IEnumerable<Cart>> GetAllCarts();
         Task<Cart> GetCartById(int id);
@@ -10,4 +12,3 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         Task<Cart> UpdateCart(int id, Cart cart);
         Task<bool> DeleteCart(int id);
     }
-}

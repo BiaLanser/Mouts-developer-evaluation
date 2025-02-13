@@ -31,7 +31,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+       // [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
@@ -40,7 +40,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             return Ok(products);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+       // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id, CancellationToken cancellationToken)
         {
@@ -59,7 +59,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             return Ok(product);
         }
         
-        [Authorize(Roles = "Admin, Manager, Customer")]
+       // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest request, CancellationToken cancellationToken)
         {
@@ -76,7 +76,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         }
         
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
         {
@@ -98,7 +98,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+       // [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id, CancellationToken cancellationToken)
         {
@@ -117,7 +117,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
         {
@@ -125,7 +125,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             return Ok(categories);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+       // [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
         public async Task<IActionResult> GetProductByCategory(string category, CancellationToken cancellationToken, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {

@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SaleController : ControllerBase
@@ -32,7 +31,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ListSaleResponse>>> GetAllSales()
         {
@@ -42,7 +41,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         }
 
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         public async Task<ActionResult<CreateSaleResponse>> CreateSale([FromBody] CreateSaleRequest request, CancellationToken cancellationToken)
         {
@@ -59,7 +58,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         }
 
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{saleNumber}")]
         public async Task<ActionResult<GetSaleResponse>> GetSaleBySaleNumber(int saleNumber, CancellationToken cancellationToken)
         {
@@ -79,7 +78,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             return Ok(sale);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPatch("cancel/{saleNumber}")]
         public async Task<IActionResult> CancelSale(int saleNumber, CancellationToken cancellationToken)
         {
@@ -99,7 +98,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             return Ok(sale);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{saleNumber}")]
         public async Task<ActionResult<UpdateSaleResponse>> UpdateSale(int saleNumber, [FromBody] UpdateSaleRequest request, CancellationToken cancellationToken)
         {
@@ -116,7 +115,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             return Ok(updatedSale);
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{saleNumber}")]
         public async Task<IActionResult> DeleteSale(int saleNumber)
         {

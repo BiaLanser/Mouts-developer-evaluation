@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
+
 namespace Ambev.DeveloperEvaluation.ORM;
 
 public class DefaultContext : DbContext
@@ -21,7 +22,17 @@ public class DefaultContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //PRODUCT
-        modelBuilder.Entity<Product>().OwnsOne(p => p.Rating);
+        modelBuilder.Entity<Product>(entity =>
+        {
+           entity.OwnsOne(p => p.Rating, r =>
+            {
+                r.Property(rating => rating.Rate)
+                    .HasColumnType("decimal(18, 2)");
+            });
+
+            entity.Property(p => p.Price)
+                .HasColumnType("decimal(18, 2)");
+        });
 
         //CART 
         modelBuilder.Entity<CartProduct>(entity =>
@@ -45,8 +56,6 @@ public class DefaultContext : DbContext
         modelBuilder.Entity<Sale>(entity =>
         {
             entity.HasOne(s => s.Cart)
-                //.WithOne() 
-                //.HasForeignKey<Sale>(s => s.CartId) 
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -54,6 +63,12 @@ public class DefaultContext : DbContext
                   .WithOne(si => si.Sale)
                   .HasForeignKey(si => si.SaleId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(s => s.Discount)
+                .HasColumnType("decimal(18, 2)");
+
+            entity.Property(s => s.TotalSaleAmount)
+                .HasColumnType("decimal(18, 2)");
         });
 
         // SALEITEM
@@ -63,6 +78,12 @@ public class DefaultContext : DbContext
                   .WithMany()
                   .HasForeignKey(si => si.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(si => si.TotalAmount)
+                .HasColumnType("decimal(18, 2)");
+
+            entity.Property(si => si.UnitPrice)
+                .HasColumnType("decimal(18, 2)");
         });
 
         //USER
@@ -93,7 +114,7 @@ public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
         var builder = new DbContextOptionsBuilder<DefaultContext>();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        builder.UseNpgsql(
+        builder.UseSqlServer(
                connectionString,
                b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.WebApi")
         );
