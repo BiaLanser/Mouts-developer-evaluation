@@ -6,12 +6,16 @@ using Ambev.DeveloperEvaluation.Application.Products.ListCategories;
 using Ambev.DeveloperEvaluation.Application.Products.ListProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.DeleteProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProductByCategory;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListCategory;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 using AutoMapper;
+using Azure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,17 +35,26 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             _mapper = mapper;
         }
 
-       // [Authorize(Roles = "Admin, Manager")]
+        // [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
+        [ProducesResponseType(typeof(ListProductResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
             var query = new ListProductsQuery { Page = _page, Size = _size, Order = _order };
             var products = await _mediator.Send(query);
-            return Ok(products);
-        }
 
+            return Ok(new ApiResponseWithData<ListProductResponse>
+            {
+                Success = true,
+                Message = "Products retrieved successfully",
+                Data = _mapper.Map<ListProductResponse>(products)
+            });
+        }
        // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(GetProductResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProductById(int id, CancellationToken cancellationToken)
         {
             var request = new GetProductRequest { Id = id };
@@ -56,11 +69,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
-            return Ok(product);
+            return Ok(new ApiResponseWithData<GetProductResponse>
+            {
+                Success = true,
+                Message = "Product retrieved successfully",
+                Data = _mapper.Map<GetProductResponse>(product)
+            });
         }
         
        // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateProductResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest request, CancellationToken cancellationToken)
         {
             var validator = new CreateProductRequestValidator();
@@ -72,12 +92,20 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             var command = _mapper.Map<CreateProductCommand>(request);
             var response = await _mediator.Send(command, cancellationToken);
 
-            return CreatedAtAction(nameof(GetProductById), new { id = response.Id }, response);
+            return CreatedAtAction(nameof(GetProductById), new { id = response.Id }, new ApiResponseWithData<CreateProductResponse>
+            {
+                Success = true,
+                Message = "Product created successfully",
+                Data = _mapper.Map<CreateProductResponse>(response)
+            });
         }
         
 
         //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<UpdateProductResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
         {
             var validator = new UpdateProductRequestValidator();
@@ -95,11 +123,19 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             if (response == null)
                 return NotFound(new { message = "Product not found" });
 
-            return Ok(response);
+            return Ok(new ApiResponseWithData<UpdateProductResponse>
+            {
+                Success = true,
+                Message = "Product updated successfully",
+                Data = _mapper.Map<UpdateProductResponse>(response)
+            });
         }
 
        // [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteProduct(int id, CancellationToken cancellationToken)
         {
             var request = new DeleteProductRequest { Id = id };
@@ -114,19 +150,32 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             if (!result.Success)
                 return NotFound(new { message = "Product not found" });
 
-            return NoContent();
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Product deleted successfully"
+            });
         }
 
         //[Authorize(Roles = "Admin, Manager")]
         [HttpGet("categories")]
+        [ProducesResponseType(typeof(ListCategoriesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCategories()
         {
             var categories = await _mediator.Send(new ListCategoriesQuery());
-            return Ok(categories);
+
+            return Ok(new ApiResponseWithData<ListCategoriesResponse>
+            {
+                Success = true,
+                Message = "Categories retrieved successfully",
+                Data = _mapper.Map<ListCategoriesResponse>(categories)
+            });
         }
 
        // [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
+        [ProducesResponseType(typeof(ListCategoriesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetProductByCategory(string category, CancellationToken cancellationToken, [FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
         {
             var request = new GetProductByCategoryRequest { Category = category };
@@ -138,7 +187,13 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
 
             var query = new GetProductByCategoryQuery { Category = category, Page = _page, Size = _size, Order = _order };
             var products = await _mediator.Send(query);
-            return Ok(products);
+
+            return Ok(new ApiResponseWithData<GetProductByCategoryResponse>
+            {
+                Success = true,
+                Message = "Products by category retrieved successfully",
+                Data = _mapper.Map<GetProductByCategoryResponse>(products)
+            });
         }
     }
 

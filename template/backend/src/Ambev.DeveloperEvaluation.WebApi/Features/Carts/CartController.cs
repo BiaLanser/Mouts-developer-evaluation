@@ -12,6 +12,13 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Carts.UpdateCart;
 using Ambev.DeveloperEvaluation.Application.Carts.UpdateCart;
 using Ambev.DeveloperEvaluation.Application.Carts.DeleteCart;
 using Ambev.DeveloperEvaluation.WebApi.Features.Carts.DeleteCart;
+using Ambev.DeveloperEvaluation.WebApi.Features.Carts.ListCart;
+using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 {
@@ -30,17 +37,27 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 
         //[Authorize(Roles = "Admin, Manager")]
         [HttpGet]
+        [ProducesResponseType(typeof(ListCartResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
         {
             var query = new ListCartsQuery { Page = _page, Size = _size, Order = _order };
             var carts = await _mediator.Send(query);
-            return Ok(carts);
+
+            return Ok(new ApiResponseWithData<ListCartResponse>
+            {
+                Success = true,
+                Message = "Carts retrieved successfully",
+                Data = _mapper.Map<ListCartResponse>(carts)
+            });
         }
 
 
        // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(GetCartResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCartById(int id, CancellationToken cancellationToken)
         {
             var request = new GetCartRequest { Id = id };
             var validator = new GetCartRequestValidator();
@@ -55,11 +72,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             if (cart == null)
                 return NotFound(new { message = "Cart not found" });
 
-            return Ok(cart);
+            return Ok(new ApiResponseWithData<GetCartResponse>
+            {
+                Success = true,
+                Message = "Cart retrieved successfully",
+                Data = _mapper.Map<GetCartResponse>(cart)
+            });
         }
 
         //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateCartResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateCartRequest request, CancellationToken cancellationToken)
         {
             var validator = new CreateCartRequestValidator();
@@ -71,11 +95,19 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             var command = _mapper.Map<CreateCartCommand>(request);
             var response = await _mediator.Send(command);
 
-            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+            return CreatedAtAction(nameof(GetCartById), new { id = response.Id }, new ApiResponseWithData<CreateCartResponse>
+            {
+                Success = true,
+                Message = "Cart created successfully",
+                Data = _mapper.Map<CreateCartResponse>(response)
+            });
         }
 
        // [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<UpdateCartResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCartRequest request, CancellationToken cancellationToken)
         {
             var validator = new UpdateCartRequestValidator();
@@ -93,11 +125,19 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             if (response == null)
                 return NotFound(new { message = "Cart not found" });
 
-            return Ok(response);
+            return Ok(new ApiResponseWithData<UpdateCartResponse>
+            {
+                Success = true,
+                Message = "Cart updated successfully",
+                Data = _mapper.Map<UpdateCartResponse>(response)
+            });
         }
         
         //[Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var request = new DeleteCartRequest { Id = id };
@@ -112,7 +152,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             if (!result.Success)
                 return NotFound(new { message = "Cart not found" });
 
-            return NoContent();
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Cart deleted successfully"
+            });
         }
 
     }
