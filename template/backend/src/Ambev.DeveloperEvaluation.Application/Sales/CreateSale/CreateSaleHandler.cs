@@ -59,6 +59,12 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 {
                     var product = await _productRepository.GetProductById(saleItem.ProductId);
 
+                    if (product == null)
+                    {
+                        _logger.LogError($"Product with ID {saleItem.ProductId} not found.");
+                        throw new InvalidOperationException($"Product with ID {saleItem.ProductId} not found.");
+                    }
+
                     if (saleItem.Quantity > 20)
                         throw new InvalidOperationException("You can only select up to 20 items");
 

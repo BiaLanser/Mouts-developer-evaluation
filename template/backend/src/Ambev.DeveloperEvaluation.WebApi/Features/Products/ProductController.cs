@@ -35,7 +35,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             _mapper = mapper;
         }
 
-        // [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [ProducesResponseType(typeof(ListProductResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllProducts([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] ProductSortOrder _order = ProductSortOrder.IdAsc)
@@ -50,7 +50,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
                 Data = _mapper.Map<ListProductResponse>(products)
             });
         }
-       // [Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GetProductResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -77,7 +77,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             });
         }
         
-       // [Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseWithData<CreateProductResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -101,7 +101,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
         }
         
 
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ApiResponseWithData<UpdateProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -131,7 +131,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             });
         }
 
-       // [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -157,7 +157,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             });
         }
 
-        //[Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("categories")]
         [ProducesResponseType(typeof(ListCategoriesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCategories()
@@ -172,7 +172,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products
             });
         }
 
-       // [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("category/{category}")]
         [ProducesResponseType(typeof(ListCategoriesResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]

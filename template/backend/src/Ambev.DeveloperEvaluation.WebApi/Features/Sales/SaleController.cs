@@ -13,6 +13,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -31,7 +32,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             _mapper = mapper;
         }
 
-        //[Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ListSaleResponse>), 200)]
         public async Task<ActionResult<IEnumerable<ListSaleResponse>>> GetAllSales()
@@ -48,7 +49,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         }
 
 
-        //[Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -72,7 +73,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         }
 
 
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{saleNumber}")]
         [ProducesResponseType(typeof(GetSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -100,7 +101,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPatch("cancel/{saleNumber}")]
         [ProducesResponseType(typeof(CancelSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -127,8 +128,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
                 Data = _mapper.Map<CancelSaleResponse>(sale)
             });
         }
-
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{saleNumber}")]
         [ProducesResponseType(typeof(UpdateSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -153,7 +154,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{saleNumber}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]

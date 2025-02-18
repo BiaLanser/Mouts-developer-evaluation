@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales
 {
@@ -11,6 +6,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales
     {
         public (decimal totalSaleAmount, decimal totalDiscount) Calculate(IEnumerable<SaleItem> saleItems)
         {
+            if (saleItems == null || !saleItems.Any())
+            {
+                throw new ArgumentException("Sale items cannot be null or empty", nameof(saleItems));
+            }
+
             decimal totalSaleAmount = 0;
             decimal totalDiscount = 0;
 
