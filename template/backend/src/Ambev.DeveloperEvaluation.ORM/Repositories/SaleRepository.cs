@@ -58,8 +58,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         public async Task<Sale> GetSaleBySaleNumber(int id)
         {
             return await _context.Sales
-            .Include(s => s.Items)
-            .FirstOrDefaultAsync(s => s.SaleNumber == id);
+                .Include(s => s.Items)
+                    .ThenInclude(si => si.Product)
+                .FirstOrDefaultAsync(s => s.SaleNumber == id);
         }
 
         public async Task<Sale> UpdateSale(Sale sale)

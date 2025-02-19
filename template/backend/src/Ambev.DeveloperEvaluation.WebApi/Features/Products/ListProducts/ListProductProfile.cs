@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Products.ListProduct;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Application.Products.ListProduct;
 using AutoMapper;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts
@@ -7,6 +8,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts
     {
         public ListProductProfile()
         {
+            CreateMap<Product, ProductResponse>();
             CreateMap<ListProductsResult, ListProductResponse>();
         }
     }

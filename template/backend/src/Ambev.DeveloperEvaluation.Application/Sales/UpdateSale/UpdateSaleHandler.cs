@@ -63,6 +63,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                 }
             }
 
+            if (!existingSale.Items.Any() && sale.Items?.Any() == true)
+            {
+                existingSale.Items = sale.Items;
+            }
+
             (decimal totalSaleAmount, decimal totalDiscount) = _discountCalculator.Calculate(sale.Items);
 
             existingSale.TotalSaleAmount = totalSaleAmount;

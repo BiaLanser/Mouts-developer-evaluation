@@ -1,4 +1,6 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.ListSale;
+﻿using Ambev.DeveloperEvaluation.Application.Sales;
+using Ambev.DeveloperEvaluation.Application.Sales.ListSale;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using AutoMapper;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSale
@@ -7,7 +9,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSale
     {
         public ListSaleProfile()
         {
-            CreateMap<ListSaleResult, ListSaleResponse>();
+            CreateMap<ListSaleResult, ListSaleResponse>()
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.SaleItems));
+
+            CreateMap<SaleItem, SaleItemDTO>();
         }
-        }
+    }
 }

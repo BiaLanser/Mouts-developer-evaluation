@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using AutoMapper;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.ListSale
@@ -13,10 +8,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.ListSale
         public ListSaleProfile()
         {
             CreateMap<Sale, ListSaleResult>()
-            .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.Items));
+                 .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.Items));
 
             CreateMap<SaleItem, SaleItemDTO>();
-
         }
     }
 }

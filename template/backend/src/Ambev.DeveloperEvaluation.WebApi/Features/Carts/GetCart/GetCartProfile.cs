@@ -9,6 +9,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts.GetCart
         {
             CreateMap<int, GetCartQuery>()
             .ConstructUsing(id => new GetCartQuery(id));
+
+            CreateMap<GetCartResult, GetCartResponse>();
         }
     }
 }

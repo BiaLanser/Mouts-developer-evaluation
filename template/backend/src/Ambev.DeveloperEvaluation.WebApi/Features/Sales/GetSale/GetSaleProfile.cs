@@ -9,6 +9,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale
         {
             CreateMap<int, GetSaleQuery>()
             .ConstructUsing(id => new GetSaleQuery(id));
+
+            CreateMap<GetSaleResult, GetSaleResponse>();
         }
     }
 }

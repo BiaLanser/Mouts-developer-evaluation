@@ -32,24 +32,24 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ListSaleResponse>), 200)]
-        public async Task<ActionResult<IEnumerable<ListSaleResponse>>> GetAllSales()
+        [ProducesResponseType(typeof(IEnumerable<List<ListSaleResponse>>), 200)]
+        public async Task<ActionResult<IEnumerable<List<ListSaleResponse>>>> GetAllSales()
         {
             var query = new ListSaleQuery();
             var sales = await _mediator.Send(query);
 
-            return Ok(new ApiResponseWithData<ListSaleResponse>
+            return Ok(new ApiResponseWithData<List<ListSaleResponse>>
             {
                 Success = true,
                 Message = "Sales retrieved successfully",
-                Data = _mapper.Map<ListSaleResponse>(sales)
+                Data = _mapper.Map<List<ListSaleResponse>>(sales)
             });
         }
 
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -64,7 +64,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             var command = _mapper.Map<CreateSaleCommand>(request);
             var sale = await _mediator.Send(command);
 
-            return CreatedAtAction(nameof(GetSaleBySaleNumber), new { id = sale.SaleNumber }, new ApiResponseWithData<CreateSaleResponse>
+            return CreatedAtAction(nameof(GetSaleBySaleNumber), new { saleNumber = sale.SaleNumber }, new ApiResponseWithData<CreateSaleResponse>
             {
                 Success = true,
                 Message = "Sale created successfully",
@@ -73,7 +73,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         }
 
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{saleNumber}")]
         [ProducesResponseType(typeof(GetSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -101,7 +101,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPatch("cancel/{saleNumber}")]
         [ProducesResponseType(typeof(CancelSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -129,7 +129,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
         
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{saleNumber}")]
         [ProducesResponseType(typeof(UpdateSaleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -154,7 +154,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{saleNumber}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]

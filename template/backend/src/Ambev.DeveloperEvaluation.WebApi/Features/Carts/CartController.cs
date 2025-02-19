@@ -14,11 +14,6 @@ using Ambev.DeveloperEvaluation.Application.Carts.DeleteCart;
 using Ambev.DeveloperEvaluation.WebApi.Features.Carts.DeleteCart;
 using Ambev.DeveloperEvaluation.WebApi.Features.Carts.ListCart;
 using Ambev.DeveloperEvaluation.WebApi.Common;
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
-using Ambev.DeveloperEvaluation.WebApi.Features.Products.GetProduct;
-using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
-using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
 {
@@ -35,7 +30,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [ProducesResponseType(typeof(ListCartResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] CartSortOrder _order = CartSortOrder.IdAsc)
@@ -52,7 +47,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
         }
 
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GetCartResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -80,7 +75,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             });
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseWithData<CreateCartResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -103,7 +98,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             });
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
+        //[Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ApiResponseWithData<UpdateCartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -133,7 +128,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts
             });
         }
         
-        [Authorize(Roles = "Admin, Manager")]
+        //[Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
