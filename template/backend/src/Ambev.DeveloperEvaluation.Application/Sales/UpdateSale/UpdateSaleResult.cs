@@ -7,7 +7,7 @@
         public int CustomerId { get; set; }
         public string Branch { get; set; }
         public bool IsCancelled { get; set; }
-        public List<SaleItemDTO> SaleItems { get; set; } = new List<SaleItemDTO>();
+        public List<SaleItemDTO> SaleItems { get; set; }
         public decimal Discount { get; set; }
         public decimal TotalSaleAmount { get; set; }
     }

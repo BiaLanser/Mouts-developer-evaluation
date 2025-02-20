@@ -8,7 +8,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
     {
         public GetSaleProfile() 
         {
-            CreateMap<Sale, GetSaleResult>();
+            CreateMap<Sale, GetSaleResult>()
+                .ForMember(dest => dest.SaleItems, opt => opt.MapFrom(src => src.Items));
+
             CreateMap<SaleItem, SaleItemDTO>();
         }
     }

@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales;
+﻿using System.Text.Json.Serialization;
+using Ambev.DeveloperEvaluation.Application.Sales;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSale
 {

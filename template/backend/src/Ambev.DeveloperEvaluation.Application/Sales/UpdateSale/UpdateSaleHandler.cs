@@ -37,6 +37,15 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             if (existingSale == null)
                 throw new KeyNotFoundException($"Sale with ID: {sale.SaleNumber} not found");
 
+            if (sale.CustomerId != existingSale.CustomerId)
+            {
+                existingSale.CustomerId = sale.CustomerId;
+            }
+
+            if (sale.Branch != existingSale.Branch)
+            {
+                existingSale.Branch = sale.Branch;
+            }
 
             if (sale.CartId != existingSale.CartId)
             {
@@ -45,11 +54,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                 if (cart == null || !cart.Products.Any())
                     throw new InvalidOperationException("Sale must contain at least one item from the cart");
 
-                existingSale.Items = cart.Products.Select(product => new SaleItem
+                existingSale.Items = cart.Products.Select(product => new SaleItem //change cart id
                 {
                     ProductId = product.ProductId,
-                    Quantity = product.Quantity
+                    Quantity = product.Quantity,
                 }).ToList();
+
+                existingSale.CartId = cart.Id;
 
                 foreach (var saleItem in existingSale.Items)
                 {
@@ -61,19 +72,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                     saleItem.UnitPrice = product.Price;
                     saleItem.ProductName = product.Title;
                 }
+
+                (decimal totalSaleAmount, decimal totalDiscount) = _discountCalculator.Calculate(existingSale.Items);
+
+                existingSale.TotalSaleAmount = totalSaleAmount;
+                existingSale.Discount = totalDiscount;
+                existingSale.SaleDate = sale.SaleDate;
             }
-
-            if (!existingSale.Items.Any() && sale.Items?.Any() == true)
-            {
-                existingSale.Items = sale.Items;
-            }
-
-            (decimal totalSaleAmount, decimal totalDiscount) = _discountCalculator.Calculate(sale.Items);
-
-            existingSale.TotalSaleAmount = totalSaleAmount;
-            existingSale.Discount = totalDiscount;
-            existingSale.SaleDate = sale.SaleDate;
-            existingSale.Items = sale.Items;
 
             var updatedSale = await _saleRepository.UpdateSale(existingSale);
 

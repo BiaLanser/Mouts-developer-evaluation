@@ -49,9 +49,10 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
         public async Task<Cart> GetCartById(int id)
         {
-            return await _context.Carts
+            var cart = await _context.Carts
                              .Include(c => c.Products)
                              .FirstOrDefaultAsync(c => c.Id == id);
+            return cart;
         }
 
         public async Task<Cart> UpdateCart(int id, Cart cart)
